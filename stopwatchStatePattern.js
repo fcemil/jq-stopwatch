@@ -30,20 +30,17 @@
                 }
 
             }
-          
-            class StopWatchRunningState  {
+
+            class StopWatchRunningState {
                 constructor(stopWatch) {
                     this.stopWatch = stopWatch;
                 }
                 stop = function stop() {
-                    window.clearInterval(interval);
+                    stopGeneral();
                     this.stopWatch.changeState(new StopWatchStoppedState(this.stopWatch));
                 }
                 reset = function reset() {
-                    window.clearInterval(interval);
-                    sec = min = hour = 0;
-                    shownSec = shownMin = shownHour = '00';
-                    clock.text ('00:00:00');
+                    resetGeneral();
                     this.stopWatch.changeState(new StopWatchInitialState(this.stopWatch));
                 }
             }
@@ -52,24 +49,21 @@
                     this.stopWatch = stopWatch;
                 }
                 start = function start() {
-                    interval = window.setInterval(counter, 1000);
+                    startGeneral();
                     this.stopWatch.changeState(new StopWatchRunningState(this.stopWatch));
                 }
                 reset = function reset() {
-                    window.clearInterval(interval);
-                    sec = min = hour = 0;
-                    shownSec = shownMin = shownHour = '00';
-                    clock.text('00:00:00');
+                    resetGeneral();
                     this.stopWatch.changeState(new StopWatchInitialState(this.stopWatch));
                 }
             }
-            class StopWatchInitialState  {
+            class StopWatchInitialState {
                 constructor(stopWatch) {
                     this.stopWatch = stopWatch;
                 }
                 start = function start() {
                     //start function
-                    interval = window.setInterval(counter, 1000);
+                    startGeneral();
                     this.stopWatch.changeState(new StopWatchRunningState(this.stopWatch));
                 }
             }
@@ -92,87 +86,100 @@
                         hour++;
                     }
                 }
+                arrangeShownValues();
+                domUpdate();
+            }
+            function arrangeShownValues() {
                 sec < 10 ? shownSec = '0' + sec : shownSec = sec;
                 min < 10 ? shownMin = '0' + min : shownMin = min;
                 sec < 10 ? shownHour = '0' + hour : shownHour = hour;
-
+            }
+            function domUpdate() {
                 clock.html(shownHour + ':' + shownMin + ':' + shownSec);
-
             }
 
             var st = new StopWatch();
 
-            startButton.click(function (e) { 
+            startButton.click(function (e) {
                 e.preventDefault();
                 st.state.start();
-                
+
             });
-            pauseButton.click(function (e) { 
+            pauseButton.click(function (e) {
                 e.preventDefault();
                 st.state.stop();
-                
+
             });
-            resetButton.click(function (e) { 
+            resetButton.click(function (e) {
                 e.preventDefault();
-                st.state.reset();    
+                st.state.reset();
             });
+            function stopGeneral() {
+                window.clearInterval(interval);
+                startButton.attr('disabled', false);
+                pauseButton.attr('disabled', true);
+            }
+            function resetGeneral() {
+                window.clearInterval(interval);
+                startButton.attr('disabled', false);
+                pauseButton.attr('disabled', true);
+                sec = min = hour = 0;
+                shownSec = shownMin = shownHour = '00';
+                clock.text('00:00:00');
+            }
 
-            elementBuilder(this,clock, startButton, pauseButton,resetButton);
+            function startGeneral() {
+                interval = window.setInterval(counter, 1000);
+                startButton.attr('disabled', true);
+                pauseButton.attr('disabled', false);
+            }
+
+            elementBuilder(this, clock, startButton, pauseButton, resetButton);
+            //builds stopWatch container
+            function elementBuilder(obj, clock, startButton, pauseButton, resetButton) {
+                var outerDiv = $('<div class= "box"></div>');
+                var innerDiv = $('<div class= "box"></div>');
+
+                let clockStyle = {
+                    "font-size": "72px",
+                    "align-self": "center",
+                    "display": "flex",
+                    "justify-content": "center",
+                    "align-items": "center",
+                    "height": "200px"
+                }
+                clock.css(clockStyle);
+                outerDiv.append(clock);
+                var buttons = $('<div></div>');
+                let buttonsStyle = {
+                    "width": "100%",
+                    "text-align": "center",
+                    "vertical-align": "middle",
+                    "align-self": "middle",
+                    "padding": "middle",
+                    "margin": "auto"
+                };
+                buttons.css(buttonsStyle)
 
 
+                let buttonCss = {
+                    "text-align": "center",
+                    "box-sizing": "border-box",
+                    "padding": "10px",
+                    "font-size": "10px",
+                    "width": "30%",
+                    "border-radius": "25px"
+                }
+                startButton.css(buttonCss);
+                pauseButton.css(buttonCss);
+                resetButton.css(buttonCss);
+                buttons.append(startButton); buttons.append(pauseButton); buttons.append(resetButton);
+                innerDiv.append(buttons);
+                outerDiv.append(innerDiv);
+                console.log(outerDiv.html())
+                outerDiv.appendTo(obj);
+            }
         })
-
-
-
-
         return this;
-
-
-
     })
 })(jQuery);
-function elementBuilder(obj, clock, startButton, pauseButton, resetButton) {
-    var outerDiv = $('<div class= "box"></div>');
-    var innerDiv = $('<div class= "box"></div>');
-
-    let clockStyle = {
-        "font-size": "72px",
-        "align-self": "center",
-        "display": "flex",
-        "justify-content": "center",
-        "align-items": "center",
-        "height": "200px"
-    }
-    clock.css(clockStyle);
-    outerDiv.append(clock);
-    var buttons = $('<div></div>');
-    let buttonsStyle = {
-        "width": "100%",
-        "text-align": "center",
-        "vertical-align": "middle",
-        "align-self": "middle",
-        "padding": "middle",
-        "margin": "auto"
-    };
-    buttons.css(buttonsStyle)
-
-
-    let buttonCss = {
-        "text-align": "center",
-        "box-sizing": "border-box",
-        "padding": "10px",
-        "font-size": "10px",
-        "width": "30%",
-        "border-radius": "25px"
-    }
-    startButton.css(buttonCss);
-    pauseButton.css(buttonCss);
-    resetButton.css(buttonCss);
-    buttons.append(startButton); buttons.append(pauseButton); buttons.append(resetButton);
-    innerDiv.append(buttons);
-    outerDiv.append(innerDiv);
-    console.log(outerDiv.html())
-    outerDiv.appendTo(obj);
-    console.log(obj)
-}
-
