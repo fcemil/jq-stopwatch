@@ -86,8 +86,7 @@
                         hour++;
                     }
                 }
-                arrangeShownValues();
-                domUpdate();
+
             }
             function arrangeShownValues() {
                 sec < 10 ? shownSec = '0' + sec : shownSec = sec;
@@ -129,7 +128,11 @@
             }
 
             function startGeneral() {
-                interval = window.setInterval(counter, 1000);
+                interval = window.setInterval(function () {
+                    counter();
+                    arrangeShownValues();
+                    domUpdate();
+                }, 1000);
                 startButton.attr('disabled', true);
                 pauseButton.attr('disabled', false);
             }
